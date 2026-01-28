@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>San Valentín</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(
+          135deg,
+          #ffe6e6 0%,
+          #ffcccc 50%,
+          #ffb3b3 100%
+        );
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Corazones flotantes de fondo */
+      .hearts-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .heart {
+        position: absolute;
+        font-size: 20px;
+        color: #e63946;
+        opacity: 0.6;
+        animation: floatHeart 6s ease-in-out infinite;
+      }
+
+      @keyframes floatHeart {
+        0%,
+        100% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.6;
+        }
+        90% {
+          opacity: 0.6;
+        }
+        100% {
+          transform: translateY(-100px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Tarjeta principal */
+      .card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(230, 57, 70, 0.3);
+        z-index: 10;
+        position: relative;
+        animation: cardEntry 0.8s ease-out;
+      }
+
+      @keyframes cardEntry {
+        0% {
+          opacity: 0;
+          transform: translateY(50px) scale(0.9);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* Foto */
+      .photo-container {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto 25px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 5px solid #e63946;
+        box-shadow: 0 10px 30px rgba(230, 57, 70, 0.4);
+        position: relative;
+      }
+
+      .photo-container::before {
+        content: "";
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #e63946, #ff758f, #e63946);
+        z-index: -1;
+        animation: borderGlow 3s ease-in-out infinite;
+      }
+
+      @keyframes borderGlow {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* Título */
+      h1 {
+        font-family: "Dancing Script", cursive;
+        font-size: 2.8rem;
+        color: #e63946;
+        margin-bottom: 15px;
+        text-shadow: 2px 2px 4px rgba(230, 57, 70, 0.2);
+      }
+
+      /* Pregunta */
+      .question {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        font-weight: 300;
+      }
+
+      /* Contenedor de botones */
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      /* Estilos base de botones */
+      button {
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-family: "Poppins", sans-serif;
+        font-weight: 600;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Botón Sí */
+      #btn-si {
+        background: linear-gradient(135deg, #4caf50, #45a049);
+        color: white;
+      }
+
+      #btn-si:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+      }
+
+      /* Botón No */
+      #btn-no {
+        background: linear-gradient(135deg, #9e9e9e, #757575);
+        color: white;
+      }
+
+      #btn-no:hover {
+        background: linear-gradient(135deg, #757575, #616161);
+      }
+
+      /* Pantalla de celebración */
+      .celebration {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ff758f 0%, #e63946 100%);
+        z-index: 100;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        animation: celebrationEntry 0.5s ease-out;
+      }
+
+      @keyframes celebrationEntry {
+        0% {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .celebration.active {
+        display: flex;
+      }
+
+      .celebration h1 {
+        font-family: "Dancing Script", cursive;
+        font-size: 4rem;
+        color: white;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        margin-bottom: 20px;
+        animation: pulse 1s ease-in-out infinite;
+      }
+
+      .celebration p {
+        font-size: 1.5rem;
+        color: white;
+        text-align: center;
+        max-width: 80%;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .celebration-hearts {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .celebration-heart {
+        position: absolute;
+        font-size: 30px;
+        animation: celebrateHeart 3s ease-out forwards;
+      }
+
+      @keyframes celebrateHeart {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-100vh) scale(0.5);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .card {
+          padding: 30px 20px;
+        }
+
+        h1 {
+          font-size: 2.2rem;
+        }
+
+        .question {
+          font-size: 1rem;
+        }
+
+        .photo-container {
+          width: 150px;
+          height: 150px;
+        }
+
+        button {
+          padding: 12px 30px;
+          font-size: 1rem;
+        }
+
+        .celebration h1 {
+          font-size: 2.5rem;
+        }
+
+        .celebration p {
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Corazones flotantes de fondo -->
+    <div class="hearts-bg" id="hearts-bg"></div>
+
+    <!-- Tarjeta principal -->
+    <div class="card">
+      <div class="photo-container">
+        <img src="assets/DSC00757.JPG" alt="Nosotros" class="photo" />
+      </div>
+      <h1>Arantxa...</h1>
+      <p class="question">¿Quieres pasar el día de San Valentín conmigo?</p>
+      <div class="buttons">
+        <button id="btn-si">¡Sí!</button>
+        <button id="btn-no">No</button>
+      </div>
+    </div>
+
+    <!-- Pantalla de celebración -->
+    <div class="celebration" id="celebration">
+      <div class="celebration-hearts" id="celebration-hearts"></div>
+      <h1>¡Te amo!</h1>
+      <p>Será el mejor San Valentín de nuestras vidas</p>
+    </div>
+
+    <script>
+      // Crear corazones flotantes de fondo
+      function createBackgroundHearts() {
+        const container = document.getElementById("hearts-bg");
+        const heartSymbols = ["❤️", "💕", "💗", "💖", "💘"];
+
+        for (let i = 0; i < 20; i++) {
+          const heart = document.createElement("div");
+          heart.className = "heart";
+          heart.textContent =
+            heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+          heart.style.left = Math.random() * 100 + "%";
+          heart.style.animationDuration = Math.random() * 4 + 4 + "s";
+          heart.style.animationDelay = Math.random() * 6 + "s";
+          heart.style.fontSize = Math.random() * 20 + 15 + "px";
+          container.appendChild(heart);
+        }
+      }
+
+      // Lógica del botón No
+      const btnNo = document.getElementById("btn-no");
+      const btnSi = document.getElementById("btn-si");
+      let noClickCount = 0;
+
+      const noTexts = [
+        "¿Estás segura?",
+        "¿De verdad?",
+        "Piénsalo bien...",
+        "¡Por favor!",
+        "🥺",
+      ];
+
+      const noScales = [0.9, 0.8, 0.7, 0.6, 0.4];
+      const siScales = [1.15, 1.3, 1.5, 1.7, 2.0];
+
+      btnNo.addEventListener("click", function () {
+        if (noClickCount < noTexts.length) {
+          // Cambiar texto del botón No
+          btnNo.textContent = noTexts[noClickCount];
+
+          // Reducir tamaño del botón No
+          btnNo.style.transform = `scale(${noScales[noClickCount]})`;
+
+          // Aumentar tamaño del botón Sí
+          btnSi.style.transform = `scale(${siScales[noClickCount]})`;
+
+          noClickCount++;
+        }
+
+        // Si ya presionó muchas veces, ocultar el botón No
+        if (noClickCount >= noTexts.length) {
+          setTimeout(() => {
+            btnNo.style.opacity = "0";
+            btnNo.style.visibility = "hidden";
+          }, 300);
+        }
+      });
+
+      // Lógica del botón Sí
+      btnSi.addEventListener("click", function () {
+        showCelebration();
+      });
+
+      // Mostrar celebración
+      function showCelebration() {
+        const celebration = document.getElementById("celebration");
+        celebration.classList.add("active");
+        createCelebrationHearts();
+      }
+
+      // Crear corazones de celebración
+      function createCelebrationHearts() {
+        const container = document.getElementById("celebration-hearts");
+        const heartSymbols = ["❤️", "💕", "💗", "💖", "💘", "💝", "💞"];
+
+        for (let i = 0; i < 50; i++) {
+          setTimeout(() => {
+            const heart = document.createElement("div");
+            heart.className = "celebration-heart";
+            heart.textContent =
+              heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+            heart.style.left = Math.random() * 100 + "%";
+            heart.style.bottom = "-50px";
+            heart.style.animationDuration = Math.random() * 2 + 2 + "s";
+            container.appendChild(heart);
+
+            // Remover después de la animación
+            setTimeout(() => heart.remove(), 4000);
+          }, i * 100);
+        }
+
+        // Continuar creando corazones
+        setInterval(() => {
+          const heart = document.createElement("div");
+          heart.className = "celebration-heart";
+          heart.textContent =
+            heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+          heart.style.left = Math.random() * 100 + "%";
+          heart.style.bottom = "-50px";
+          heart.style.animationDuration = Math.random() * 2 + 2 + "s";
+          container.appendChild(heart);
+
+          setTimeout(() => heart.remove(), 4000);
+        }, 200);
+      }
+
+      // Inicializar
+      createBackgroundHearts();
+    </script>
+  </body>
+</html>
