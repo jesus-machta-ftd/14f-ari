@@ -189,6 +189,13 @@
       #btn-no {
         background: linear-gradient(135deg, #9e9e9e, #757575);
         color: white;
+        position: relative;
+        z-index: 50;
+      }
+
+      #btn-no.escaping {
+        position: fixed;
+        transition: none;
       }
 
       #btn-no:hover {
@@ -203,12 +210,26 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #ff758f 0%, #e63946 100%);
+        background-image: url("assets/A1E154BC-3DDD-4079-8D6B-FF6E4FB82A24_1_105_c.jpeg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
         z-index: 100;
         justify-content: center;
         align-items: center;
         flex-direction: column;
         animation: celebrationEntry 0.5s ease-out;
+      }
+
+      .celebration::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: -1;
       }
 
       @keyframes celebrationEntry {
@@ -332,7 +353,7 @@
     <div class="celebration" id="celebration">
       <div class="celebration-hearts" id="celebration-hearts"></div>
       <h1>¡Te amo!</h1>
-      <p>Será el mejor San Valentín de nuestras vidas</p>
+      <p>Será la mejor cita de nuestras vidas</p>
     </div>
 
     <script>
@@ -354,43 +375,99 @@
         }
       }
 
-      // Lógica del botón No
+      // Lógica del botón No - Escape del mouse
       const btnNo = document.getElementById("btn-no");
       const btnSi = document.getElementById("btn-si");
-      let noClickCount = 0;
+      let escapeCount = 0;
 
       const noTexts = [
+        "No",
         "¿Estás segura?",
         "¿De verdad?",
         "Piénsalo bien...",
-        "¡Por favor!",
+        "¡No puedes!",
+        "¡Imposible!",
         "🥺",
+        "¡Dale que sí!",
       ];
 
-      const noScales = [0.9, 0.8, 0.7, 0.6, 0.4];
-      const siScales = [1.15, 1.3, 1.5, 1.7, 2.0];
+      // Distancia mínima para que el botón escape
+      const escapeDistance = 100;
 
-      btnNo.addEventListener("click", function () {
-        if (noClickCount < noTexts.length) {
-          // Cambiar texto del botón No
-          btnNo.textContent = noTexts[noClickCount];
+      // Función para mover el botón a una posición aleatoria
+      function moveButtonAway(mouseX, mouseY) {
+        const btnRect = btnNo.getBoundingClientRect();
+        const btnCenterX = btnRect.left + btnRect.width / 2;
+        const btnCenterY = btnRect.top + btnRect.height / 2;
 
-          // Reducir tamaño del botón No
-          btnNo.style.transform = `scale(${noScales[noClickCount]})`;
+        // Calcular nueva posición alejándose del mouse
+        let newX, newY;
+        const padding = 20;
+        const maxAttempts = 10;
 
-          // Aumentar tamaño del botón Sí
-          btnSi.style.transform = `scale(${siScales[noClickCount]})`;
+        for (let i = 0; i < maxAttempts; i++) {
+          // Generar posición aleatoria
+          newX =
+            padding +
+            Math.random() * (window.innerWidth - btnRect.width - padding * 2);
+          newY =
+            padding +
+            Math.random() * (window.innerHeight - btnRect.height - padding * 2);
 
-          noClickCount++;
+          // Verificar que esté lejos del mouse
+          const distToMouse = Math.sqrt(
+            Math.pow(newX - mouseX, 2) + Math.pow(newY - mouseY, 2),
+          );
+          if (distToMouse > escapeDistance * 1.5) break;
         }
 
-        // Si ya presionó muchas veces, ocultar el botón No
-        if (noClickCount >= noTexts.length) {
-          setTimeout(() => {
-            btnNo.style.opacity = "0";
-            btnNo.style.visibility = "hidden";
-          }, 300);
+        // Activar modo escape si no está activo
+        if (!btnNo.classList.contains("escaping")) {
+          btnNo.classList.add("escaping");
         }
+
+        // Mover el botón
+        btnNo.style.left = newX + "px";
+        btnNo.style.top = newY + "px";
+
+        // Cambiar texto
+        escapeCount++;
+        const textIndex = Math.min(escapeCount, noTexts.length - 1);
+        btnNo.textContent = noTexts[textIndex];
+
+        // Hacer crecer el botón Sí
+        const siScale = 1 + escapeCount * 0.1;
+        btnSi.style.transform = `scale(${Math.min(siScale, 2)})`;
+      }
+
+      // Detectar cuando el mouse se acerca al botón
+      document.addEventListener("mousemove", function (e) {
+        const btnRect = btnNo.getBoundingClientRect();
+        const btnCenterX = btnRect.left + btnRect.width / 2;
+        const btnCenterY = btnRect.top + btnRect.height / 2;
+
+        // Calcular distancia del mouse al centro del botón
+        const distance = Math.sqrt(
+          Math.pow(e.clientX - btnCenterX, 2) +
+            Math.pow(e.clientY - btnCenterY, 2),
+        );
+
+        // Si el mouse está muy cerca, mover el botón
+        if (distance < escapeDistance) {
+          moveButtonAway(e.clientX, e.clientY);
+        }
+      });
+
+      // También mover si intenta hacer click
+      btnNo.addEventListener("click", function (e) {
+        moveButtonAway(e.clientX, e.clientY);
+      });
+
+      // Soporte táctil para móviles
+      btnNo.addEventListener("touchstart", function (e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        moveButtonAway(touch.clientX, touch.clientY);
       });
 
       // Lógica del botón Sí
